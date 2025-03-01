@@ -1,10 +1,10 @@
-  
+
 --------------------------------------------------------------------
--- HASKELL ABSTRACT SYNTAX TREES FOR IMP                  
--- Roy Crole and Paula Severi 2025                                           
+-- HASKELL ABSTRACT SYNTAX TREES FOR IMP
+-- Roy Crole and Paula Severi 2025
 --------------------------------------------------------------------
 
-module AST where 
+module AST where
 
 type V = String
 type B = Bool
@@ -13,17 +13,16 @@ type FileName = String
 
 
 data Error =  SyntaxError | UninitializedVar
-              deriving (Eq, Show)   
-              
-
--- COMPLETE THE TYPE FOR THE STATE 
---type State = ???
+              deriving (Eq, Show)
 
 
-data Instruction = Run FileName | Eval Prog | Quit 
+type State = [(V, Z)]
+
+
+data Instruction = Run FileName | Eval Prog | Quit
                    deriving (Eq,Show)
 
-type Prog  = (Code,State)  
+type Prog  = (Code,State)
 
 
 data Code  = E IntExp | C Com
@@ -33,23 +32,14 @@ data Code  = E IntExp | C Com
 data Bop =   Le | Gr | LeEq | GrEq
              deriving (Eq,Show)
 
-data Iop = Plus | Minus | Times 
+data Iop = Plus | Minus | Times
              deriving (Eq,Show)
 
--- COMPLETE THE FOLLOWING DATA TYPES
+data Com   =  Ass (V, IntExp) | Seq (Com, Com) | If (BoolExp, Com, Com) | While (BoolExp, Com) | Repeat (Com, BoolExp)
+        deriving (Eq, Show)
 
---data Com   =  ???
-             
---data BoolExp   =  ???
-             
---data IntExp   =  ???       
-             
+data BoolExp   =  Bool B | BopExp (Bop, IntExp, IntExp)
+                deriving (Eq, Show)
 
-
-
-
-              
-
-
-
-
+data IntExp   =  Int Z | Var V | IopExp (Iop, IntExp, IntExp)
+                deriving (Eq, Show)
