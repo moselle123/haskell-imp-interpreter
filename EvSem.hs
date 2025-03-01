@@ -1,8 +1,8 @@
 
---------------------------------------------------------------------- 
--- SML EVALUATION SEMANTICS FOR IMP                                   
--- Roy Crole and Paula Severi 2025                                            
---------------------------------------------------------------------- 
+---------------------------------------------------------------------
+-- SML EVALUATION SEMANTICS FOR IMP
+-- Roy Crole and Paula Severi 2025
+---------------------------------------------------------------------
 
 module EvSem
 
@@ -12,19 +12,19 @@ import AST
 import Basic
 
 -------------------------------------------------------------------
--- Helper functions: Converting  the constructors for operators into real functions 
+-- Helper functions: Converting  the constructors for operators into real functions
 --  You could use these functions to make the code shorter
 -------------------------------------------------------------------
 
 fromIop  :: Iop -> (Int -> Int -> Int)
 fromIop Plus  = (+)
 fromIop Minus = (-)
-fromIop Times = (*) 
+fromIop Times = (*)
 
 fromBop  :: Bop -> (Int -> Int -> Bool)
 fromBop Le = (<)
 fromBop Gr = (>)
-fromBop LeEq = (<=) 
+fromBop LeEq = (<=)
 fromBop GrEq = (>=)
 
 
@@ -33,58 +33,60 @@ fromBop GrEq = (>=)
 ----------------------------------------------------------------
 
 
-{-- 
-evalint :: IntExp -> State -> (Either Error Int) 
+evalint :: IntExp -> State -> (Either Error Int)
 
-evalint (Int m) s = Right m 
+evalint (Int m) s = Right m
 
-evalint  (Var v) s =  ???
+evalint  (Var v) s =  lookUp s v
 
-evalint  (IopExp (op,e1,e2))  s = do 
-             m1 <-  evalint e1 s 
-             m2 <-  evalint e2 s 
+evalint  (IopExp (op,e1,e2))  s = do
+             m1 <-  evalint e1 s
+             m2 <-  evalint e2 s
              Right (fromIop op m1 m2)
-                                        
-                                                      
-                                     
---}
 
-                                      
+
  ---------------------------------------------------------------------
 -- Code the function evalbool for evaluating Boolean Expressions
 -----------------------------------------------------------------------
 
-{--
 evalbool :: BoolExp -> State -> (Either Error Bool)
-evalbool  (Bool b) s = Right b 
-evalbool  (BopExp (op,e1,e2))  s =  ???
-                                                       
---}
-                                         
+evalbool  (Bool b) s = Right b
+evalbool  (BopExp (op,e1,e2))  s =  do
+                m1 <- evalint e1 s
+                m2 <- evalint e2 s
+                Right (fromBop op m1 m2)
+
 --------------------------------------------------------------------------
 -- Code the function evalcom for evaluating Commands
 ---------------------------------------------------------------------------
 
-{-- 
-evalcom :: Com -> State -> (Either Error State) 
+evalcom :: Com -> State -> (Either Error State)
 
 
-evalcom (Ass(v,e)) s = ???
+evalcom (Ass(v,e)) s = do
+        val <- evalint e s
+        Right (update s v val)
 
-evalcom (Seq(co1,co2))  s1  =  ???
-                                      
-        
-evalcom (If(be,co1,co2)) s = ???
-               
+evalcom (Seq(co1,co2))  s1  =  do
+        s2 <- evalcom co1 s1
+        evalcom co2 s2
 
-evalcom (While(be,co)) s1 = ???
-          
-          
-          
-evalcom (Repeat(co, be)) s1 = ???
 
---}
-                                 
-         
-       
-       
+evalcom (If(be,co1,co2)) s = do
+        c <- evalbool be s
+        evalcom (if c then co1 else co2) s
+
+
+evalcom (While(be,co)) s1 = do
+        cond <- evalbool be s1
+        if cond
+        then do
+                s' <- evalcom co s1
+                evalcom (While be co) s'
+        else Right s1
+
+
+evalcom (Repeat(co, be)) s1 = do
+        s' <- evalcom co s1
+        cond <- evalbool be s'
+        if cond then Right s' else evalcom (Repeat co be) s'
