@@ -77,16 +77,16 @@ evalcom (If(be,co1,co2)) s = do
         evalcom (if c then co1 else co2) s
 
 
-evalcom (While(be,co)) s1 = do
+evalcom (While (be, co)) s1 = do
         cond <- evalbool be s1
         if cond
         then do
                 s' <- evalcom co s1
-                evalcom (While be co) s'
+                evalcom (While (be, co)) s'
         else Right s1
 
 
 evalcom (Repeat(co, be)) s1 = do
         s' <- evalcom co s1
         cond <- evalbool be s'
-        if cond then Right s' else evalcom (Repeat co be) s'
+        if cond then Right s' else evalcom (Repeat (co, be)) s'
