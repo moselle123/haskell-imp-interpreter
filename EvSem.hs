@@ -11,10 +11,6 @@ where
 import AST
 import Basic
 
--------------------------------------------------------------------
--- Helper functions: Converting  the constructors for operators into real functions
---  You could use these functions to make the code shorter
--------------------------------------------------------------------
 
 fromIop  :: Iop -> (Int -> Int -> Int)
 fromIop Plus  = (+)
@@ -27,12 +23,6 @@ fromBop Gr = (>)
 fromBop LeEq = (<=)
 fromBop GrEq = (>=)
 
-
-----------------------------------------------------------------
---  Code the function evalint for evaluating Integer Expressions
-----------------------------------------------------------------
-
-
 evalint :: IntExp -> State -> (Either Error Int)
 
 evalint (Int m) s = Right m
@@ -44,21 +34,12 @@ evalint  (IopExp (op,e1,e2))  s = do
              m2 <-  evalint e2 s
              Right (fromIop op m1 m2)
 
-
- ---------------------------------------------------------------------
--- Code the function evalbool for evaluating Boolean Expressions
------------------------------------------------------------------------
-
 evalbool :: BoolExp -> State -> (Either Error Bool)
 evalbool  (Bool b) s = Right b
 evalbool  (BopExp (op,e1,e2))  s =  do
                 m1 <- evalint e1 s
                 m2 <- evalint e2 s
                 Right (fromBop op m1 m2)
-
---------------------------------------------------------------------------
--- Code the function evalcom for evaluating Commands
----------------------------------------------------------------------------
 
 evalcom :: Com -> State -> (Either Error State)
 
