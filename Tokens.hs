@@ -1,7 +1,7 @@
 
 ---------------------------------------------------------------------------
--- HASKELL TOKENS FOR EXPRESSIONS AND COMMANDS FOR IMPERATIVE LANGUAGE IMP                          
--- Roy L. Crole and Paula Severi 2025                                          
+-- HASKELL TOKENS FOR EXPRESSIONS AND COMMANDS FOR IMPERATIVE LANGUAGE IMP
+-- Roy L. Crole and Paula Severi 2025
 ---------------------------------------------------------------------------
 
 
@@ -17,98 +17,66 @@ type IMPwords = [IMPword]
 
 data Token = Id IMPword | Key IMPword | Num IMPword
              deriving (Show, Eq)
-             
+
 type Tokens = [Token]
 
 
---- Keywords 
+--- Keywords
 
 keywords  :: IMPwords
 keywords = ["true","false","while","do","if","then","else","run","eval","trans","repeat","until", "quit","C","E"]
 
--- Special symbols 
+-- Special symbols
 
 symbols :: IMPwords
 symbols = ["(",")","+","-","*","<=",">=","<",">",";",":=","[",",","]","[]"]
 
--- complete the code for is_letter
-{--
 is_letter :: Char -> Bool
-is_letter c = 'A'<=c && c<='Z' || ???
---}
+is_letter c = 'A'<=c && c<='Z' || 'a' <= c && c <= 'z'
 
--- complete the code for is_digit
-{--
-is_digit c = '0'<=c && ??
---}
+is_digit c = '0'<=c && c <= '9'
 
-is_neg c = '-' == c 
+is_neg c = '-' == c
 
 specials = ",!@#$%^&*()_-+=|[]:;'~`<>.?/"
 
--- delete the comment from is_special if you have already coded mem in Basics.hs
-
-{-- 
 is_special c = c `mem` specials
---}
 
-
--- complete the code for the function alpha
-{--
 alpha :: (String, IMPFile) -> (String, IMPFile)
-alpha (al, c:cs) = if is_letter c then alpha(al++[c],cs) else (al, c:cs)
-alpha (al,[]) = ???
---}
+alpha (al, c:cs) = if is_letter c then alpha (al++[c],cs) else (al, c:cs)
+alpha (al,[]) = (al, [])
 
-
--- complete the code for the function numeric
-{--
 numeric :: (String, IMPFile) -> (String, IMPFile)
-numeric (nu, c:cs) = ???
-numeric (nu,[]) = ???
---}
+numeric (nu, c:cs) = if is_digit c then numeric (nu ++ [c], cs) else (nu, c:cs)
+numeric (nu,[]) = (nu, [])
 
--- complete the code for symbolic
-{--
 symbolic :: (String, IMPFile) -> (String, IMPFile)
-symbolic (sy, c:cs) = 
-  if ??? then ??? else
+symbolic (sy, c:cs) =
+  if sy == "" then if is_special c then symbolic ([c], cs) else (sy, c:cs)
     if
-      (sy++[c]) `mem` ???
+      (sy++[c]) `mem` symbols
     then
-      symbolic (???, ???)
-    else ???
+      symbolic (sy ++ [c], cs)
+    else (sy, c:cs)
 symbolic (sy, []) = (sy, [])
 
---}
-
-----------------------------------
--- complete the code for scanning
------------------------------------
-{--
-scanning :: (Tokens, IMPFile) -> Tokens 
+scanning :: (Tokens, IMPFile) -> Tokens
 scanning (toks, []) = toks
-scanning (toks, c:cs) = 
-      if 
+scanning (toks, c:cs) =
+      if
         is_letter c
       then
-        let (al, cs2) = alpha([c],cs) in 
+        let (al, cs2) = alpha([c],cs) in
         if al `mem` keywords then scanning (toks++[Key al],cs2) else scanning (toks++[Id al],cs2)
-      else 
+      else
         if is_digit c  then
-          ???
-        else 
-          if ??? then
-            ???
+          let (num, cs2) = numeric([c], cs) in scanning (toks ++ [Num num], cs2)
+        else
+          if is_special c then
+            let (sym, cs2) = symbolic([c], cs) in scanning (toks ++ [Key sym], cs2)
           else
               scanning (toks,cs)
- --}           
 
 
--- Delete the comments for tokenize once you code scanning
-{--
-tokenize :: IMPFile -> Tokens 
+tokenize :: IMPFile -> Tokens
 tokenize impf = scanning([], impf)
---}
-
-
