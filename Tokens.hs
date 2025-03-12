@@ -52,12 +52,13 @@ numeric (nu,[]) = (nu, [])
 
 symbolic :: (String, IMPFile) -> (String, IMPFile)
 symbolic (sy, c:cs) =
-  if sy == "" then if is_special c then symbolic ([c], cs) else (sy, c:cs)
-    if
-      (sy++[c]) `mem` symbols
-    then
-      symbolic (sy ++ [c], cs)
+  if sy == "" then
+    if is_special c
+    then symbolic ([c], cs)
     else (sy, c:cs)
+  else if (sy ++ [c]) `mem` symbols
+       then symbolic (sy ++ [c], cs)
+       else (sy, c:cs)
 symbolic (sy, []) = (sy, [])
 
 scanning :: (Tokens, IMPFile) -> Tokens
