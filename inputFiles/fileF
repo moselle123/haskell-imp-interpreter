@@ -1,0 +1,8 @@
+
+(C  i:= 0;  sum := 0; while i <= n do  (sum := sum + i; i:= i+1),  [(n,4)])
+
+(C i:=0 ; sum:=0 ; while (i<= n) do  sum:= sum+i ; i:=(i+1), [(n,4)])
+
+(C (if x>y then (max:= x; min := y )  else min:= x); max := y, [ (x,5), (y, 1)])
+
+
